@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    {% load static %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{{ page_title }}</title>
+    <link rel="icon" href="{% static 'src/favi.ico'%}" type="image/x-icon"/>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{% static 'bower_components/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- MetisMenu CSS -->
+    <link href="{% static 'bower_components/metisMenu/dist/metisMenu.min.css' %}" rel="stylesheet">
+
+    <!-- Timeline CSS -->
+    <link href="{% static 'dist/css/timeline.css' %}" rel="stylesheet">
+
+    <!-- Morris Charts CSS -->
+    <link href="{% static 'bower_components/morrisjs/morris.css' %}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{% static 'dist/css/sb-admin-2.css' %}" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="{% static 'bower_components/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+    <!--clock-->
+
+    <link rel="stylesheet" type="text/css" href="{% static 'clock/css/style.css' %}" />
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <!--<link rel="stylesheet" type="text/css" href="{% static 'clock/jquery.tzineClock/jquery.tzineClock.css' %}" />-->
+
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.5/css/jquery.dataTables.css">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+<div id="wrapper">
+    <div class="row">
+        <!-- Navigation -->
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">Simple Accounting v1.0.1</a>
+            </div>
+            <!-- /.navbar-header -->
+
+            <ul class="nav navbar-top-links navbar-right shift-right">
+                Hello, <b>{{loggedInUser}} </b>
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-user">
+                        <li>
+                            <a href="/add_new_client_user/"><i class="fa fa-table fa-fw"></i>Add a Stuff</a>
+                        </li>
+                        <li>
+                            <a href="/client_users_list/"><i class="fa fa-edit fa-fw"></i> List of all Stuffs</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li><a href="/profile"><i class="fa fa-user fa-fw"></i> User Profile</a>
+                        </li>
+                        <li><a href="/change_password"><i class="fa fa-gear fa-fw"></i> Change Password</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li><a href="/logout"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                        </li>
+                    </ul>
+                    <!-- /.dropdown-user -->
+                </li>
+                <!-- /.dropdown -->
+            </ul>
+            <!-- /.navbar-top-links -->
+
+            <div class="navbar-default sidebar" role="navigation">
+                <div class="sidebar-nav navbar-collapse collapse">
+                    <ul class="nav" id="side-menu">
+                        <li>
+                            <a href="/employee_list"><i class="fa fa-table fa-fw"></i> List of Employee</a>
+                        </li>
+                        <li>
+                            <a href="/add_employee"><i class="fa fa-edit fa-fw"></i> Add More Employee</a>
+                        </li>
+                        <li>
+                            <a href="/all_task"><i class="fa fa-edit fa-fw"></i> View All Task Assigned</a>
+                        </li>
+                        <li>
+                            <a href="/attendance"><i class="fa fa-edit fa-fw"></i> View All Attendance</a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- /.sidebar-collapse -->
+            </div>
+            <!-- /.navbar-static-side -->
+        </nav>
+
+        <!-- Page Content -->
+        <div id="page-wrapper">
+            {% block content %} {% endblock %}
+        </div>
+        <!-- /#page-wrapper -->
+    </div>
+    <div class="row">
+        <p class="m-t foot_logo" align="left"> <img src="{% static 'src/inflack_logo.png'%}" style="width:73px;height:19px" alt="inflack"><br><small>Inflack Limited &copy; 2015</small> </p>
+    </div>
+</div>
+<!-- /#wrapper -->
+
+<!-- jQuery -->
+<script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
+<!-- jQuery -->
+<!--<script type="text/javascript" charset="utf8" src="//code.jquery.com/jquery-1.10.2.min.js"></script>-->
+<script type="text/javascript">
+    $(document).ready( function () {
+//        $('#table_id').DataTable();
+        $('.dt-page').DataTable( {
+            paging: true
+        } );
+    } );
+</script>
+<!-- DataTables -->
+<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.5/js/jquery.dataTables.js"></script>
+<!-- Bootstrap Core JavaScript -->
+<script src="{% static 'bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+
+<!-- Metis Menu Plugin JavaScript -->
+<script src="{% static 'bower_components/metisMenu/dist/metisMenu.min.js' %}"></script>
+
+<!-- Morris Charts JavaScript -->
+<script src="{% static 'bower_components/raphael/raphael-min.js' %}"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="{% static 'dist/js/sb-admin-2.js' %}"></script>
+<script src="{% static 'js/custom.js' %}"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.0.0/moment.min.js"></script>
+<script type="text/javascript" src="{% static 'clock/js/script.js' %}"></script>
+</body>
+
+</html>

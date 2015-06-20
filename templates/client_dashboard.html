@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="row">
+    <!--<div class="col-lg-12 col-md-12 col-sm-12">-->
+    <div  style="text-align: -webkit-right;">
+        <div id="clock" class="light">
+            <!--<div class="display">-->
+            <div class="ampm"></div>
+            <div class="digits"></div>
+            <!--</div>-->
+        </div>
+    </div>
+    <!--</div>-->
+    <!-- /.col-lg-12 -->
+</div>
+
+<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="modalRecieveMoney">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                Confirm
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-12"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div id="modalSubmitBtn">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% if wrn %}
+<div class="alert alert-danger alert-dismissable">
+    <button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>
+    <p align="center">{{ text }}</p>
+</div>
+{% endif %}
+<script src="{% static 'footable.js' %}"></script>
+{% endblock %}
