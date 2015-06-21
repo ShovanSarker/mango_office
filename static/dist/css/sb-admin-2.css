@@ -425,3 +425,14 @@ table.dataTable thead .sorting:after {
 .nav-left .active{
     border-right: none !important;
 }
+
+.btn-custom {
+    width: 112px !important;
+    margin-top: 3px;
+}
+
+.col-custom {
+    padding-left: 10px; !important;
+    padding-right: 10px; !important;
+
+}

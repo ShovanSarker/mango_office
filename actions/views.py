@@ -2,7 +2,10 @@ from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from users.models import AllUsers
+from users.models import AllUsers, ACL
+from status.models import Status
+from django.contrib.auth.models import User
+
 # Create your views here.
 
 
@@ -13,16 +16,16 @@ def login_page(request):
 
 @csrf_exempt
 def login_auth(request):
-    postdata = request.POST
-    print(postdata)
-    if 'username' and 'password' in postdata:
-        print(postdata['username'])
-        print(postdata['password'])
-        user = authenticate(username=postdata['username'], password=postdata['password'])
+    post_data = request.POST
+    print(post_data)
+    if 'username' and 'password' in post_data:
+        print(post_data['username'])
+        print(post_data['password'])
+        user = authenticate(username=post_data['username'], password=post_data['password'])
         if user is not None:
             if user.is_active:
                 login(request, user)
-                request.session['user'] = postdata['username']
+                request.session['user'] = post_data['username']
                 if user.is_superuser:
                     res = redirect('/admin')
                 else:
@@ -51,21 +54,28 @@ def logout_now(request):
 
 @login_required(login_url='/login/')
 def home(request):
-    page_title = '|Home|'
+    page_title = 'Home'
     user = request.session['user']
     if not AllUsers.objects.exists():
         print(request.session['user'])
-        new_user = AllUsers(username=user, Name=user, Email=user+'@inflack.com', Admin=True)
+        new_status = Status.objects.get(StatusKey='office')
+        new_user = AllUsers(username=user, Name=user, Email=user + '@inflack.com', Status=new_status)
         new_user.save()
-
+        new_user_acl = ACL(user=new_user,
+                           CanSeeOthersTaskList=True,
+                           CanSeeOthersAttendance=True,
+                           CanAddMoreEmployee=True,
+                           CanSeeOthersDetails=True,
+                           CanSeeOthersStatus=True)
+        new_user_acl.save()
     if AllUsers.objects.filter(username__exact=user).exists():
-        admin_user = AllUsers.objects.get(username__exact=user)
-        admin_admin = admin_user.Admin
-        login_user = admin_user.Name
-        if admin_user.Active:
-            display = render(request, 'client_dashboard.html', {'loggedInUser': login_user,
-                                                                'page_title': page_title,
-                                                                'admin_admin': admin_admin})
+        this_user = AllUsers.objects.get(username__exact=user)
+        if this_user.Active:
+            all_status = Status.objects.all()
+            display = render(request, 'client_dashboard.html', {'login_user': this_user,
+                                                                'can_add_employee': this_user.acl.CanAddMoreEmployee,
+                                                                'all_status': all_status,
+                                                                'page_title': page_title})
         else:
             logout(request)
             display = render(request, 'login.html',
@@ -79,68 +89,83 @@ def home(request):
     return display
 
 
-    # @login_required(login_url='/login/')
-    # def add_employee(request):
-    #     user = request.session['user']
-    #     post_data = request.POST
-    #     # print(post_data['super-admin'])
-    #     if 'username' in post_data and 'csrfmiddlewaretoken' in post_data:
-    #         # if admin
-    #         if AllUsers.objects.filter(username__exact=user).exists():
-    #             admin_user = AllUsers.objects.get(username__exact=user)
-    #             admin_admin = admin_user.Admin
-    #             loggedInUser = admin_user.Name
-    #             if admin_user.Active and admin_admin:
-    #                 if AdminUser.objects.filter(username__exact=post_data['username']).exists() or \
-    #                         ClientUser.objects.filter(username__exact=post_data['username']).exists():
-    #                     display = render(request, 'add_admin.html',
-    #                                      {'wrong': True,
-    #                                       'text': 'Username already taken. Please try with a different username.',
-    #                                       'admin': admin,
-    #                                       'loggedInUser': loggedInUser,
-    #                                       'admin_admin': admin_admin})
-    #                 else:
-    #                     if post_data['re-password'] == post_data['password']:
-    #                         new_admin_username = post_data['username']
-    #                         new_admin_name = post_data['name']
-    #                         new_admin_phone = post_data['phone']
-    #                         new_admin_email = post_data['email']
-    #                         if 'super-admin' in post_data and post_data['super-admin'] == 'on':
-    #                             new_admin_super_admin = True
-    #                         else:
-    #                             new_admin_super_admin = False
-    #                         new_admin_password = post_data['password']
-    #                         new_added_admin = AdminUser(username=new_admin_username,
-    #                                                     Name=new_admin_name,
-    #                                                     Email=new_admin_email,
-    #                                                     Admin=new_admin_super_admin,
-    #                                                     Phone=new_admin_phone)
-    #                         new_added_admin.save()
-    #                         new_user = User.objects.create_user(new_admin_username,
-    #                                                             new_admin_email,
-    #                                                             new_admin_password)
-    #                         new_user.save()
-    #                         display = render(request, 'add_admin.html',
-    #                                          {'wrong': True,
-    #                                           'loggedInUser': loggedInUser,
-    #                                           'text': 'The new user is added successfully',
-    #                                           'admin': admin,
-    #                                           'admin_admin': admin_admin})
-    #                     else:
-    #                         display = render(request, 'add_admin.html',
-    #                                          {'wrong': True,
-    #                                           'loggedInUser': loggedInUser,
-    #                                           'text': 'Passwords do not match. Please Try Again.',
-    #                                           'admin': admin,
-    #                                           'admin_admin': admin_admin})
-    #             else:
-    #                 logout(request)
-    #                 display = render(request, 'login.html',
-    #                                  {'wrong': True,
-    #                                   'text': 'You are not authorized to login.'
-    #                                           ' Please contact administrator for more details'})
-    #         else:
-    #             display = redirect('/')
-    #     else:
-    #         display = redirect('/add_admin/')
-    #     return display
+@login_required(login_url='/login/')
+def add_employee(request):
+    user = request.session['user']
+    post_data = request.POST
+    this_user = AllUsers.objects.get(username__exact=user)
+    # login_user = this_user.Name
+    # print(post_data['super-admin'])
+    if 'username' in post_data and 'csrfmiddlewaretoken' in post_data:
+        if AllUsers.objects.filter(username__exact=user).exists():
+            if this_user.Active and this_user.acl.CanAddMoreEmployee:
+                if AllUsers.objects.filter(username__exact=post_data['username']).exists() or \
+                                post_data['username'] == 'admin':
+                    # This username is already taken
+                    print(post_data)
+                    display = render(request, 'add_admin.html', {'page_title': 'Add Employee',
+                                                                 'login_user': this_user,
+                                                                 'can_add_employee': this_user.acl.CanAddMoreEmployee,
+                                                                 'wrong': True,
+                                                                 'text': 'This USERNAME is already taken.'
+                                                                         'Please try with a different one'})
+                else:
+                    if post_data['password'] == post_data['re-password']:
+                        # password matches
+                        print(post_data)
+                        new_user = AllUsers(username=post_data['username'],
+                                            Name=post_data['name'],
+                                            Designation=post_data['designation'],
+                                            Phone=post_data['phone'],
+                                            Email=post_data['email'])
+                        new_user.save()
+                        new_user_acl = ACL(user=new_user)
+                        new_user_acl.save()
+                        new_user_login = User.objects.create_user(post_data['username'],
+                                                                  post_data['email'],
+                                                                  post_data['password'])
+                        new_user_login.save()
+                        display = render(request, 'add_admin.html', {'page_title': 'Add Employee',
+                                                                     'login_user': this_user,
+                                                                     'can_add_employee': this_user.acl.CanAddMoreEmployee,
+                                                                     'success': True,
+                                                                     'text': 'New employee has been '
+                                                                             'added successfully.'})
+                    else:
+                        display = render(request, 'add_admin.html', {'page_title': 'Add Employee',
+                                                                     'login_user': login_user,
+                                                                     'can_add_employee': this_user.acl.CanAddMoreEmployee,
+                                                                     'wrong': True,
+                                                                     'text': 'The passwords do not match.'
+                                                                             'Please try again'})
+            else:
+                logout(request)
+                display = render(request, 'login.html',
+                                 {'wrong': True,
+                                  'text': 'You are not authorized to login.'
+                                          ' Please contact administrator for more details'})
+        else:
+            display = redirect('/')
+    else:
+        if this_user.acl.CanAddMoreEmployee:
+            display = render(request, 'add_admin.html', {'page_title': 'Add Employee',
+                                                         'login_user': this_user,
+                                                         'can_add_employee': this_user.acl.CanAddMoreEmployee})
+        else:
+            display = render(request, 'access_denied.html')
+    return display
+
+
+@login_required(login_url='/login/')
+def change_status(request):
+    user = request.session['user']
+    get_data = request.GET
+    if AllUsers.objects.filter(username__exact=user).exists():
+        new_status = Status.objects.get(StatusKey=get_data['to'])
+        this_user = AllUsers.objects.get(username__exact=user)
+        this_user.Status = new_status
+        this_user.save()
+        display = redirect('/')
+    else:
+        display = redirect('/logout')
+    return display

@@ -3,37 +3,20 @@
 {% block content %}
 
 <div class="row">
-    <!--<div class="col-lg-12 col-md-12 col-sm-12">-->
-    <div  style="text-align: -webkit-right;">
+    <div class="col-lg-9 col-md-8 col-sm-8">
+    </div>
+    <div class="col-lg-3 col-md-4 col-sm-4 col-custom">
         <div id="clock" class="light">
-            <!--<div class="display">-->
             <div class="ampm"></div>
             <div class="digits"></div>
-            <!--</div>-->
         </div>
-    </div>
-    <!--</div>-->
-    <!-- /.col-lg-12 -->
-</div>
-
-<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true" id="modalRecieveMoney">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                Confirm
-            </div>
-            <div class="modal-body">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-md-12"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <div id="modalSubmitBtn">
-                </div>
-            </div>
-        </div>
+        {% for status in all_status %}
+            <button onclick="location.href='/change_status/?to={{status.StatusKey}}'" type="button" class="btn {{status.StatusChangeButton}} btn-custom">{{status.Status}}</button>
+        {% endfor %}
+        <!--<button type="button" class="btn btn-success btn-custom">In Office</button>-->
+        <!--<button type="button" class="btn btn-info btn-custom">Away</button>-->
+        <!--<button type="button" class="btn btn-warning btn-custom">In meeting</button>-->
+        <!--<button type="button" class="btn btn-danger btn-custom">Out of Office</button>-->
     </div>
 </div>
 {% if wrn %}
