@@ -436,3 +436,12 @@ table.dataTable thead .sorting:after {
     padding-right: 10px; !important;
 
 }
+
+.btn-sm-custom {
+    width: 90px !important;
+    margin-top: 3px;
+}
+
+.btn-no-color {
+    border-color: #fff; !important;
+}

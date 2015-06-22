@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from users.models import AllUsers, ACL
 from status.models import Status
+from task.models import Task
 from django.contrib.auth.models import User
 
 # Create your views here.
@@ -73,6 +74,7 @@ def home(request):
         if this_user.Active:
             all_status = Status.objects.all()
             display = render(request, 'client_dashboard.html', {'login_user': this_user,
+                                                                'can_see_others_status': this_user.acl.CanSeeOthersStatus,
                                                                 'can_add_employee': this_user.acl.CanAddMoreEmployee,
                                                                 'all_status': all_status,
                                                                 'page_title': page_title})
@@ -105,6 +107,7 @@ def add_employee(request):
                     print(post_data)
                     display = render(request, 'add_admin.html', {'page_title': 'Add Employee',
                                                                  'login_user': this_user,
+                                                                 'can_see_others_status': this_user.acl.CanSeeOthersStatus,
                                                                  'can_add_employee': this_user.acl.CanAddMoreEmployee,
                                                                  'wrong': True,
                                                                  'text': 'This USERNAME is already taken.'
@@ -113,11 +116,13 @@ def add_employee(request):
                     if post_data['password'] == post_data['re-password']:
                         # password matches
                         print(post_data)
+                        new_status = Status.objects.get(StatusKey='office')
                         new_user = AllUsers(username=post_data['username'],
                                             Name=post_data['name'],
                                             Designation=post_data['designation'],
                                             Phone=post_data['phone'],
-                                            Email=post_data['email'])
+                                            Email=post_data['email'],
+                                            Status=new_status)
                         new_user.save()
                         new_user_acl = ACL(user=new_user)
                         new_user_acl.save()
@@ -127,13 +132,15 @@ def add_employee(request):
                         new_user_login.save()
                         display = render(request, 'add_admin.html', {'page_title': 'Add Employee',
                                                                      'login_user': this_user,
+                                                                     'can_see_others_status': this_user.acl.CanSeeOthersStatus,
                                                                      'can_add_employee': this_user.acl.CanAddMoreEmployee,
                                                                      'success': True,
                                                                      'text': 'New employee has been '
                                                                              'added successfully.'})
                     else:
                         display = render(request, 'add_admin.html', {'page_title': 'Add Employee',
-                                                                     'login_user': login_user,
+                                                                     'login_user': this_user,
+                                                                     'can_see_others_status': this_user.acl.CanSeeOthersStatus,
                                                                      'can_add_employee': this_user.acl.CanAddMoreEmployee,
                                                                      'wrong': True,
                                                                      'text': 'The passwords do not match.'
@@ -150,9 +157,13 @@ def add_employee(request):
         if this_user.acl.CanAddMoreEmployee:
             display = render(request, 'add_admin.html', {'page_title': 'Add Employee',
                                                          'login_user': this_user,
+                                                         'can_see_others_status': this_user.acl.CanSeeOthersStatus,
                                                          'can_add_employee': this_user.acl.CanAddMoreEmployee})
         else:
-            display = render(request, 'access_denied.html')
+            display = render(request, 'access_denied.html', {'page_title': 'Add Employee',
+                                                             'login_user': this_user,
+                                                             'can_see_others_status': this_user.acl.CanSeeOthersStatus,
+                                                             'can_add_employee': this_user.acl.CanAddMoreEmployee})
     return display
 
 
@@ -166,6 +177,47 @@ def change_status(request):
         this_user.Status = new_status
         this_user.save()
         display = redirect('/')
+    else:
+        display = redirect('/logout')
+    return display
+
+
+@login_required(login_url='/login/')
+def employee_list(request):
+    user = request.session['user']
+    if AllUsers.objects.filter(username__exact=user).exists():
+        this_user = AllUsers.objects.get(username__exact=user)
+        if this_user.acl.CanSeeOthersStatus:
+            all_employees = AllUsers.objects.all()
+            display = render(request, 'admin_list.html', {'page_title': 'Add Employee',
+                                                          'login_user': this_user,
+                                                          'all_employees': all_employees,
+                                                          'can_see_others_status': this_user.acl.CanSeeOthersStatus,
+                                                          'can_add_employee': this_user.acl.CanAddMoreEmployee})
+        else:
+            display = render(request, 'access_denied.html', {'page_title': 'Add Employee',
+                                                             'login_user': this_user,
+                                                             'can_see_others_status': this_user.acl.CanSeeOthersStatus,
+                                                             'can_add_employee': this_user.acl.CanAddMoreEmployee})
+    else:
+        display = redirect('/logout')
+    return display
+
+
+@login_required(login_url='/login/')
+def all_task(request):
+    user = request.session['user']
+    if AllUsers.objects.filter(username__exact=user).exists():
+        this_user = AllUsers.objects.get(username__exact=user)
+        # if this_user.acl.CanSeeOthersStatus:
+        all_tasks = Task.objects.filter(AssignedTo=this_user)
+        assigned_tasks = Task.objects.filter(AssignedBy=this_user)
+        display = render(request, 'all_task.html', {'page_title': 'Task List',
+                                                    'login_user': this_user,
+                                                    'all_tasks': all_tasks,
+                                                    'assigned_tasks': assigned_tasks,
+                                                    'can_see_others_status': this_user.acl.CanSeeOthersStatus,
+                                                    'can_add_employee': this_user.acl.CanAddMoreEmployee})
     else:
         display = redirect('/logout')
     return display

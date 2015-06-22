@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'actions',
     'users',
     'status',
+    'task',
 )
 
 MIDDLEWARE_CLASSES = (

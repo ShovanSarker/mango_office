@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <h1 class="page-header">Task List</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<div class="panel">
+    <div class="panel panel-body-custom">
+        <div class="tab-content">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#all-transactions">Tasks you were assigned</a>
+                        </li>
+                        <li><a data-toggle="tab" href="#selected-transaction">Tasks you assigned other</a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div id="all-transactions" class="tab-pane fade in active">
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-6 no-padding">
+                                    <h4>Task Pending</h4>
+                                    <div class="panel-body">
+                                        <ol>
+                                            {% for task in all_tasks %}
+                                            {% if not task.Complete%}
+                                            <li>
+                                                <button type="button" class="btn btn-default btn-xs btn-no-color" data-toggle="modal" data-target="#task{{task.id}}">
+                                                    {{task.Task}}
+                                                </button>
+                                            </li>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </ol>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6 no-padding">
+                                    <h4>Task Finished</h4>
+                                    <div class="panel-body">
+                                        <ol>
+                                            {% for task in all_tasks %}
+                                            {% if task.Complete%}
+                                            <li>
+                                                <button type="button" class="btn btn-default btn-xs btn-no-color" data-toggle="modal" data-target="#task{{task.id}}">
+                                                    <strike>{{task.Task}}</strike>
+                                                </button>
+                                            </li>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="selected-transaction" class="tab-pane fade">
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-sm-6 no-padding">
+                                    <h4>Task Pending</h4>
+                                    <div class="panel-body">
+                                        <ol>
+                                            {% for task in assigned_tasks %}
+                                            {% if not task.Complete%}
+                                            <li>
+                                                <button type="button" class="btn btn-default btn-xs btn-no-color" data-toggle="modal" data-target="#assignedtask{{task.id}}">
+                                                    {{task.Task}}
+                                                </button>
+                                            </li>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </ol>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-6 no-padding">
+                                    <h4>Task Finished</h4>
+                                    <div class="panel-body">
+                                        <ol>
+                                            {% for task in assigned_tasks %}
+                                            {% if task.Complete%}
+                                            <li>
+                                                <button type="button" class="btn btn-default btn-xs btn-no-color" data-toggle="modal" data-target="#assignedtask{{task.id}}">
+                                                    <strike>{{task.Task}}</strike>
+                                                </button>
+                                            </li>
+                                            {% endif %}
+                                            {% endfor %}
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--modal content-->
+                {% for task in all_tasks %}
+                <div class="modal fade" role="dialog" aria-labelledby="gridSystemModalLabel" id="task{{task.id}}">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="gridSystemModalLabel">{{task.Task}}</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="container-fluid">
+                                    <div class="row">Task : {{task.Task}}</div>
+                                    <div class="row">Assigned By : {{task.AssignedBy}}</div>
+                                    <div class="row">{% if task.Deadline == "" %} Not Given! {% else %}Deadline : {{task.Deadline}}{% endif %}</div>
+                                    <div class="row">Description : {{task.Description}}</div>
+                                    <div class="row">Remarks : {{task.Remarks}}</div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                </div><!-- /.modal -->
+
+                {% endfor %}
+
+                {% for task in assigned_tasks %}
+                <div class="modal fade" role="dialog" aria-labelledby="gridSystemModalLabel2" id="assignedtask{{task.id}}">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="gridSystemModalLabel2">{{task.Task}}</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="container-fluid">
+                                    <div class="row">Task : {{task.Task}}</div>
+                                    <div class="row">Assigned To : {{task.AssignedTo}}</div>
+                                    <div class="row">{% if task.Deadline == "" %} Not Given! {% else %}Deadline : {{task.Deadline}}{% endif %}</div>
+                                    <div class="row">Description : {{task.Description}}</div>
+                                    <div class="row">Remarks : {{task.Remarks}}</div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                </div><!-- /.modal -->
+
+                {% endfor %}
+                <!--modal content-->
+            </div>
+            <!-- /.panel-body -->
+        </div>
+    </div>
+</div>
+<!-- /.panel-body -->
+</div>
+<!-- /.panel -->
+<!-- Large modal -->
+<!--<button type="button" class="btn btn-primary" id="btnReciveMoney">Large modal</button>-->
+
+{% if wrn %}
+<div class="alert alert-danger alert-dismissable">
+    <button class="close" aria-hidden="true" data-dismiss="alert" type="button">×</button>
+    <p align="center">{{ text }}</p>
+</div>
+{% endif %}
+<script src="{% static 'footable.js' %}"></script>
+{% endblock %}

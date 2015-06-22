@@ -2,7 +2,7 @@ from django.conf.urls import patterns, include, url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.conf import settings
-from actions.views import login_page, login_auth, home, logout_now, add_employee, change_status
+from actions.views import login_page, login_auth, home, logout_now, add_employee, change_status, employee_list, all_task
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -17,6 +17,8 @@ urlpatterns = patterns('',
                        url(r'^logout/', view=logout_now, name='home'),
                        url(r'^add_employee/', view=add_employee, name='home'),
                        url(r'^change_status/', view=change_status, name='home'),
+                       url(r'^employee_list/', view=employee_list, name='home'),
+                       url(r'^all_task/', view=all_task, name='home'),
                        )
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

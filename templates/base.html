@@ -100,10 +100,12 @@
                         <li>
                             <a href="/"><i class="fa fa-tachometer fa-fw"></i> Dashboard</a>
                         </li>
-                        {% if can_add_employee %}
+                        {% if can_see_others_status %}
                         <li>
                             <a href="/employee_list"><i class="fa fa-list-ul fa-fw"></i> List of Employee</a>
                         </li>
+                        {% endif %}
+                        {% if can_add_employee %}
                         <li>
                             <a href="/add_employee"><i class="fa fa-user-plus fa-fw"></i> Add More Employee</a>
                         </li>
@@ -114,6 +116,7 @@
                         <li>
                             <a href="/attendance"><i class="fa fa-pencil fa-fw"></i> View All Attendance</a>
                         </li>
+
                     </ul>
                 </div>
                 <!-- /.sidebar-collapse -->
@@ -139,12 +142,12 @@
 <!--<script type="text/javascript" charset="utf8" src="//code.jquery.com/jquery-1.10.2.min.js"></script>-->
 
 <!--<script type="text/javascript">-->
-    <!--$(document).ready( function () {-->
+<!--$(document).ready( function () {-->
 <!--//        $('#table_id').DataTable();-->
-        <!--$('.dt-page').DataTable( {-->
-            <!--paging: true-->
-        <!--} );-->
-    <!--} );-->
+<!--$('.dt-page').DataTable( {-->
+<!--paging: true-->
+<!--} );-->
+<!--} );-->
 <!--</script>-->
 
 <!-- DataTables -->
