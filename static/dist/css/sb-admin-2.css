@@ -445,3 +445,8 @@ table.dataTable thead .sorting:after {
 .btn-no-color {
     border-color: #fff; !important;
 }
+
+.btn-ext {
+    width: 224px !important;
+    margin-top: 3px;
+}

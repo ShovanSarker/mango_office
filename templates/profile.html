@@ -14,20 +14,39 @@
             User Information
         </div>
         <div class="panel-body">
-            Name : {{loggedInUser}} </br>
-            Username : {{username}} </br>
-            Email : {{email}} </br>
-            Phone : {{phone}} </br>
-            Rank : {% if isadmin%} Admin {% else %} Stuff {% endif %}</br>
-            Status : {% if active%} Active {% else %} Inactive {% endif %}</br>
-            Date joined : {{joined_since}}
+            <table>
+                <tr>
+                    <td>Name</td>
+                    <td> &nbsp;:&nbsp;</td>
+                    <td> {{this_user.Name}}</td>
+                </tr>
+                <tr>
+                    <td>Username</td>
+                    <td> &nbsp;:&nbsp;</td>
+                    <td> {{this_user.username}}</td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td> &nbsp;:&nbsp;</td>
+                    <td> {{this_user.Email}}</td>
+                </tr>
+                <tr>
+                    <td>Phone</td>
+                    <td> &nbsp;:&nbsp;</td>
+                    <td> {{this_user.Phone}}</td>
+                </tr>
+                <tr>
+                    <td>Designation</td>
+                    <td> &nbsp;:&nbsp;</td>
+                    <td> {{this_user.Designation}}</td>
+                </tr>
+                <tr>
+                    <td>Date joined</td>
+                    <td> &nbsp;:&nbsp;</td>
+                    <td> {{this_user.DateAdded|date:"d/M/Y"}}</td>
+                </tr>
+            </table>
         </div>
-        {% if client %}
-        <div class="panel-footer">
-            Name Of the Company : {{client_name}}</br>
-            Address of the Company : {{company_address}}
-        </div>
-        {% endif %}
     </div>
 </div>
 {% endblock %}

@@ -28,7 +28,7 @@
                                 <td>{{employee.Name}}</td>
                                 <td>{{employee.Email}}</td>
                                 <td>{{employee.Phone}}</td>
-                                <td>{{employee.DateAdded}}</td>
+                                <td>{{employee.DateAdded|date:"D, d M Y"}}</td>
                                 <td><button type="button" class="btn {{employee.Status.StatusChangeButton}} btn-xs btn-sm-custom">{{employee.Status.Status}}</button></td>
                             </tr>
                         {% endfor %}

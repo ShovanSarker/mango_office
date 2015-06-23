@@ -5,6 +5,9 @@ from django.contrib.auth.decorators import login_required
 from users.models import AllUsers, ACL
 from status.models import Status
 from task.models import Task
+import datetime
+from attendance.models import AttendanceInOffice, AttendanceInHome
+
 from django.contrib.auth.models import User
 
 # Create your views here.
@@ -174,8 +177,35 @@ def change_status(request):
     if AllUsers.objects.filter(username__exact=user).exists():
         new_status = Status.objects.get(StatusKey=get_data['to'])
         this_user = AllUsers.objects.get(username__exact=user)
-        this_user.Status = new_status
-        this_user.save()
+        current_status = this_user.Status
+        print(current_status.StatusKey)
+        print(get_data['to'])
+
+        if ((get_data['to'] == 'office' or get_data['to'] == 'away' or
+                     get_data['to'] == 'meeting' or get_data['to'] == 'out') and current_status.StatusKey != 'home') or \
+                                get_data['to'] == 'home' and current_status.StatusKey == 'out' or \
+                                get_data['to'] == 'out' and current_status.StatusKey == 'home':
+            if (get_data['to'] == 'office' or get_data['to'] == 'away' or get_data['to'] == 'meeting') \
+                    and current_status.StatusKey == 'out':
+                new_office_attendance = AttendanceInOffice(User=this_user)
+                new_office_attendance.save()
+            elif get_data['to'] == 'home'and current_status.StatusKey == 'out':
+                new_home_attendance = AttendanceInHome(User=this_user)
+                new_home_attendance.save()
+            elif get_data['to'] == 'out'and current_status.StatusKey == 'home':
+                new_home_attendance = AttendanceInHome.objects.get(User=this_user, ExitTime=None)
+                print(datetime.datetime.now())
+                new_home_attendance.ExitTime = datetime.datetime.now()
+                new_home_attendance.save()
+            elif get_data['to'] == 'out'and (current_status.StatusKey == 'office' or
+                                                     current_status.StatusKey == 'away' or
+                                                     current_status.StatusKey == 'meeting'):
+                new_office_attendance = AttendanceInOffice.objects.get(User=this_user, ExitTime=None)
+                print(datetime.datetime.now())
+                new_office_attendance.ExitTime = datetime.datetime.now()
+                new_office_attendance.save()
+            this_user.Status = new_status
+            this_user.save()
         display = redirect('/')
     else:
         display = redirect('/logout')
@@ -221,3 +251,39 @@ def all_task(request):
     else:
         display = redirect('/logout')
     return display
+
+
+@login_required(login_url='/login/')
+def attendance(request):
+    user = request.session['user']
+    if AllUsers.objects.filter(username__exact=user).exists():
+        this_user = AllUsers.objects.get(username__exact=user)
+        # if this_user.acl.CanSeeOthersStatus:
+        office_work = AttendanceInOffice.objects.filter(User=this_user)
+        home_work = AttendanceInHome.objects.filter(User=this_user)
+        display = render(request, 'attendance.html', {'page_title': 'Attendance',
+                                                      'login_user': this_user,
+                                                      'office_work': office_work,
+                                                      'home_work': home_work,
+                                                      'can_see_others_status': this_user.acl.CanSeeOthersStatus,
+                                                      'can_add_employee': this_user.acl.CanAddMoreEmployee})
+    else:
+        display = redirect('/logout')
+    return display
+
+
+@login_required(login_url='/login/')
+def profile(request):
+    user = request.session['user']
+    if AllUsers.objects.filter(username__exact=user).exists():
+        this_user = AllUsers.objects.get(username__exact=user)
+        display = render(request, 'profile.html', {'page_title': 'Profile',
+                                                   'login_user': this_user,
+                                                   'this_user': this_user,
+                                                   'can_see_others_status': this_user.acl.CanSeeOthersStatus,
+                                                   'can_add_employee': this_user.acl.CanAddMoreEmployee})
+    else:
+        display = redirect('/logout')
+    return display
+
+
